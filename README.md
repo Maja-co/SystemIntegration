@@ -1,4 +1,4 @@
-# System Integration Portfolio 🚀
+# System Integration 
 
 Welcome to my repository showcasing my work from the **System Integration** elective during my AP Degree in Computer Science (Datamatiker).
 
