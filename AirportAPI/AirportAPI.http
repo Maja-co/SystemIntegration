@@ -1,0 +1,9 @@
+@AirportAPI_HostAddress = http://localhost:5175
+
+### Send besked til GateInfo controlleren
+GET {{AirportAPI_HostAddress}}/GateInfo
+airline: SAS
+gateNumber: 12
+flightNumber: SK123
+
+###

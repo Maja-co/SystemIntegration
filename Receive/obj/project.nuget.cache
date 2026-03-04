@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "fBXifCgZC4c=",
+  "success": true,
+  "projectFilePath": "/Users/majakragelund/Desktop/Datamatiker/Systemintegration/OpgaverSystemintegration/Receive/Receive.csproj",
+  "expectedPackageFiles": [
+    "/Users/majakragelund/.nuget/packages/rabbitmq.client/7.2.0/rabbitmq.client.7.2.0.nupkg.sha512",
+    "/Users/majakragelund/.nuget/packages/system.threading.ratelimiting/8.0.0/system.threading.ratelimiting.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
