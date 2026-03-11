@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "+sxnDH0cg7E=",
+  "success": true,
+  "projectFilePath": "/Users/majakragelund/Desktop/Datamatiker/Systemintegration/OpgaverSystemintegration/TodoApi/TodoApi.csproj",
+  "expectedPackageFiles": [
+    "/Users/majakragelund/.nuget/packages/microsoft.aspnetcore.openapi/10.0.3/microsoft.aspnetcore.openapi.10.0.3.nupkg.sha512",
+    "/Users/majakragelund/.nuget/packages/microsoft.entityframeworkcore/10.0.3/microsoft.entityframeworkcore.10.0.3.nupkg.sha512",
+    "/Users/majakragelund/.nuget/packages/microsoft.entityframeworkcore.abstractions/10.0.3/microsoft.entityframeworkcore.abstractions.10.0.3.nupkg.sha512",
+    "/Users/majakragelund/.nuget/packages/microsoft.entityframeworkcore.analyzers/10.0.3/microsoft.entityframeworkcore.analyzers.10.0.3.nupkg.sha512",
+    "/Users/majakragelund/.nuget/packages/microsoft.entityframeworkcore.inmemory/10.0.3/microsoft.entityframeworkcore.inmemory.10.0.3.nupkg.sha512",
+    "/Users/majakragelund/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

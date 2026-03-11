@@ -66,7 +66,7 @@ public class AuthorsController : ControllerBase {
 
 
     // Opretter en ny forfatter
-    [HttpPost]
+    [HttpPut("{flightNumber}")]
     public ActionResult<Author> PostAuthor(Author author) {
         var createdAuthor = _dataService.AddAuthor(author);
         return CreatedAtAction(nameof(GetAuthor), new { id = createdAuthor.Id }, createdAuthor);
