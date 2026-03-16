@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using BlogPostApi.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registrer DbContext med InMemory
-builder.Services.AddDbContext<BlogPostData>(opt =>
-    opt.UseInMemoryDatabase("BlogDb"));
+
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
