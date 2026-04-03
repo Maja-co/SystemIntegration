@@ -1,8 +1,5 @@
-using System.Text;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 using Scalar.AspNetCore;
 using TaxiPublisher.Db;
 
@@ -12,9 +9,8 @@ namespace TaxiPublisher {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddHostedService<OrderAcceptanceService>();
             builder.Services.AddOpenApi();
 
             builder.Services.AddDbContext<OrdersContext>(op => op.UseInMemoryDatabase("OrdersDb"));
@@ -25,44 +21,6 @@ namespace TaxiPublisher {
             await channel.ExchangeDeclareAsync("orders", ExchangeType.Fanout);
             builder.Services.AddSingleton<IChannel>(channel);
             var app = builder.Build();
-
-            await channel.QueueDeclareAsync("accept-order", exclusive: false);
-            var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.ReceivedAsync += async (model, ea) => {
-                Console.WriteLine($"Received Request: {ea.BasicProperties.CorrelationId}");
-                string replyMessage;
-
-                var orderId = Encoding.UTF8.GetString(ea.Body.ToArray());
-                using var scope = app.Services.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<OrdersContext>();
-
-                var order = db.Orders.Find(orderId);
-                if (order != null) {
-                    db.Orders.Remove(order);
-                    db.SaveChanges();
-                    replyMessage = "accept";  // ← simpelt
-                } else {
-                    replyMessage = "ikke tilgængelig";
-                }
-
-                var replyProperties = new BasicProperties {
-                    CorrelationId = ea.BasicProperties.CorrelationId // ← kopiér ID
-                };
-                var body = Encoding.UTF8.GetBytes(replyMessage);
-                if (string.IsNullOrEmpty(ea.BasicProperties.ReplyTo)) {
-                    Console.WriteLine("No reply-to property set. Cannot send reply.");
-                    return;
-                }
-
-                await channel.BasicPublishAsync(
-                    exchange: string.Empty,
-                    routingKey: ea.BasicProperties.ReplyTo, // ← send til klientens kø
-                    mandatory: true,
-                    basicProperties: replyProperties,
-                    body: body
-                );
-            };
-            await channel.BasicConsumeAsync("accept-order", autoAck: true, consumer: consumer);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment()) {
