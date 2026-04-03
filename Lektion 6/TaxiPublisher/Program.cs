@@ -7,8 +7,7 @@ namespace TaxiPublisher {
     public class Program {
         public static async Task Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
+            
             builder.Services.AddControllers();
             builder.Services.AddHostedService<OrderAcceptanceService>();
             builder.Services.AddOpenApi();
@@ -29,10 +28,7 @@ namespace TaxiPublisher {
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

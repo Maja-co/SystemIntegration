@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
 using System.Text.Json;
-using System.Threading.Channels;
 using TaxiPublisher.Db;
 using TaxiPublisher.Model;
 
