@@ -1,2 +1,7 @@
 .DS_Store
 .idea/
+# Mit miniprojekt (har sit eget repository)
+/AirportWebApi/
+# .NET bygge-filer
+[Bb]in/
+[Oo]bj/

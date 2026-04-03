@@ -13,3 +13,8 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+# Mit miniprojekt (har sit eget repository)
+/AirportWebApi/
+# .NET bygge-filer
+[Bb]in/
+[Oo]bj/
