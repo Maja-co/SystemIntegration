@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Examples/" />
+  <Folder Name="/Examples/Routing/">
+    <Project Path="Examples/Routing/EmitLogDirect/EmitLogDirect.csproj" />
+    <Project Path="Examples/Routing/ReceiveLogsDirect/ReceiveLogsDirect.csproj" />
+  </Folder>
+  <Folder Name="/Examples/Topics/">
+    <Project Path="Examples/Topics/EmitLogTopic/EmitLogTopic.csproj" />
+    <Project Path="Examples/Topics/ReceiveLogsTopic/ReceiveLogsTopic.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+</Solution>
