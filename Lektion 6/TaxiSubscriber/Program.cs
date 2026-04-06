@@ -23,11 +23,22 @@ namespace TaxiSubscriber {
 
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.ReceivedAsync += (model, ea) => {
-                byte[] body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+
+                // Tjek om det er en "fjern ordre" besked
+                if (message.StartsWith("remove:"))
+                {
+                    var removedId = message.Replace("remove:", "");
+                    _orders.RemoveAll(order => order.Id == removedId);
+                    Console.WriteLine($"Ordre {removedId} er accepteret af en anden chauffør");
+                    PrintOrders();
+                    return Task.CompletedTask;
+                }
+
+                // Eksisterende logik — normal ny ordre
                 Order? order = JsonSerializer.Deserialize<Order>(message);
-                Console.WriteLine($"Ny order modtaget");
-                if (order is not null) {
+                if (order is not null)
+                {
                     _orders.Add(order);
                     PrintOrders();
                 }
