@@ -5,57 +5,69 @@ using TaxiPublisher.Db;
 
 namespace TaxiPublisher;
 
-public class OrderAcceptanceService : BackgroundService {
-    private readonly IChannel _channel;
+public class OrderAcceptService : IHostedService {
     private readonly IServiceProvider _serviceProvider;
+    private IChannel? _channel;
 
-    public OrderAcceptanceService(IChannel channel, IServiceProvider serviceProvider) {
-        _channel = channel;
+    public OrderAcceptService(IServiceProvider serviceProvider) {
         _serviceProvider = serviceProvider;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
-        // Opretter køen
+    public async Task StartAsync(CancellationToken cancellationToken) {
+        // Alt RabbitMQ-logik fra Program.cs flyttet hertil
+        var factory = new ConnectionFactory() { HostName = "localhost" };
+        var connection = await factory.CreateConnectionAsync();
+        _channel = await connection.CreateChannelAsync();
+
         await _channel.QueueDeclareAsync("accept-order", exclusive: false);
         var consumer = new AsyncEventingBasicConsumer(_channel);
 
         consumer.ReceivedAsync += async (model, ea) => {
             var orderId = Encoding.UTF8.GetString(ea.Body.ToArray());
+
+            // Nyt scope fordi IHostedService er Singleton
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<OrdersContext>();
 
-            var order = db.Orders.Find(orderId);
             string replyMessage;
+            var order = db.Orders.Find(orderId);
 
             if (order != null) {
                 db.Orders.Remove(order);
                 db.SaveChanges();
                 replyMessage = "accept";
-                var deleteMessage = $"REMOVE:{orderId}";
-                var deleteBody = Encoding.UTF8.GetBytes(deleteMessage);
-                
-                // Sender beskeden ud til fanout-exchangen "orders"
-                await _channel.BasicPublishAsync("orders", string.Empty, deleteBody);
+
+                // Fortæl ALLE subscribers at ordren er fjernet
+                var removeBody = Encoding.UTF8.GetBytes($"remove:{orderId}");
+                await _channel.BasicPublishAsync(
+                    exchange: "orders", // fanout exchange = går til alle.
+                    routingKey: string.Empty,
+                    body: removeBody
+                );
             }
             else {
                 replyMessage = "ikke tilgængelig";
             }
 
-            // Send svar tilbage til den chauffør der prøvede at tage ordren
-            if (!string.IsNullOrEmpty(ea.BasicProperties.ReplyTo)) {
-                var replyProperties = new BasicProperties {
-                    CorrelationId = ea.BasicProperties.CorrelationId
-                };
-                var body = Encoding.UTF8.GetBytes(replyMessage);
+            var replyProperties = new BasicProperties {
+                CorrelationId = ea.BasicProperties.CorrelationId
+            };
+            var body = Encoding.UTF8.GetBytes(replyMessage);
 
-                // Sender svar direkte tilbage til chaufførens egen kø
-                await _channel.BasicPublishAsync(string.Empty, ea.BasicProperties.ReplyTo, true, replyProperties, body);
-            }
+            await _channel.BasicPublishAsync(
+                exchange: string.Empty,
+                routingKey: ea.BasicProperties.ReplyTo,
+                mandatory: true,
+                basicProperties: replyProperties,
+                body: body
+            );
         };
 
         await _channel.BasicConsumeAsync("accept-order", autoAck: true, consumer: consumer);
-        
-        // Holder servicen kørende indtil programmet lukkes
-        await Task.Delay(Timeout.Infinite, stoppingToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) {
+        _channel?.CloseAsync(); // Sluk pænt
+        return Task.CompletedTask;
     }
 }
