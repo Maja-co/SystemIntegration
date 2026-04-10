@@ -20,26 +20,34 @@ public class OutboxWorker : BackgroundService {
                 var sender = scope.ServiceProvider.GetRequiredService<IShippingMessageSender>();
 
                 // 1. Find ubehandlede beskeder i databasen
-                var message = context.OutboxMessages.Where(outMessage => outMessage.ProcessedAtUTC == null)
-                    .FirstOrDefault();
-                if (message != null) {
-                    try {
-                        // Serialisering (objekt → JSON)
-                        var order = JsonSerializer.Deserialize<Order>(message.Payload);
-                        if (order != null) {
-                            // 2. Send dem via 'sender'
-                            await sender.SendMessageAsync(order);
+                var messages = context.OutboxMessages.Where(outMessage => outMessage.ProcessedAtUTC == null).Take(50)
+                    .ToList();
+                if (messages.Any()) {
+                    foreach (var message in messages) {
+                        try {
+                            // Serialisering (objekt → JSON)
+                            var order = JsonSerializer.Deserialize<Order>(message.Payload);
+                            if (order != null) {
+                                // 2. Send dem via 'sender'
+                                await sender.SendMessageAsync(order);
 
-                            // 3. Marker dem som færdige i 'context'
-                            message.ProcessedAtUTC = DateTime.UtcNow;
-                            await context.SaveChangesAsync();
+                                // 3. Marker dem som færdige i 'context'
+                                message.ProcessedAtUTC = DateTime.UtcNow;
 
-                            _logger.LogInformation("Outbox worker sendte besked for ordre: {Id}", order.Id);
+
+                                _logger.LogInformation("Outbox worker sendte besked for ordre: {Id}", order.Id);
+                            }
+                        }
+                        catch (Exception e) {
+                            _logger.LogError(e, "Fejl ved behandling af outbox besked {Id}. Afbyder batch.",
+                                message.Id);
+                            // Hvis RabbitMQ er nede, fejler SendMessageAsync
+                            break;
                         }
                     }
-                    catch (Exception e) {
-                        _logger.LogError(e, "Fejl ved behandling af outbox besked {Id}", message.Id);
-                    }
+
+                    // 4. Gem alle opdateringer i databasen på en gang
+                    await context.SaveChangesAsync();
                 }
 
                 await Task.Delay(5000, stoppingToken);

@@ -86,9 +86,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lektion 8", "Lektion 8", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lektion 9", "Lektion 9", "{D926E514-0AA3-4421-B277-9315E8A341B8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lektion 10", "Lektion 10", "{504829E9-C292-48E6-B28D-BEA5D56CEC7A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lektion 11", "Lektion 11", "{C05E1F83-E774-4EF1-BFF9-E01220E224EB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lektion 12", "Lektion 12", "{504829E9-C292-48E6-B28D-BEA5D56CEC7A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemIntegration08", "SystemIntegration08-master\SystemIntegration08\SystemIntegration08.csproj", "{47B0221A-A425-43EC-87DC-C0EE36E5DB48}"
 EndProject
